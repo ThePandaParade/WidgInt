@@ -10,6 +10,7 @@ Ever wanted to integrate Spotify, Time, or other similar widgets into your bio o
 | Discord  | Not Planned | Due to Discord's ToS, there's no way we can support this.                  | N/A            |
 | Twitter  | Planned     | Currently unavailable as I don't have any access to Twitter's Extended API | N/A            |
 | Console  | Supported   | Mostly used for testing purposes.                                          | @WhenDawnEnds  |
+
 ## Setup Instructions (Windows)
 TODO
 
