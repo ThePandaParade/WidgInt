@@ -12,7 +12,7 @@ const SpotifyApi = new SpotifyWebApi({
 })
 
 
-fastify.get("/" + process.env.SPOTIFY_REDIRECT_ROUTE, async (request, reply) => {
+fastify.get(process.env.SPOTIFY_REDIRECT_ROUTE, async (request, reply) => {
     console.log("Received request to authorize.")
     SpotifyApi.authorizationCodeGrant(request.query.code).then(async (data) => {
         let accesstoken = data.body["access_token"]
@@ -25,9 +25,9 @@ fastify.get("/" + process.env.SPOTIFY_REDIRECT_ROUTE, async (request, reply) => 
         console.log(accesstoken,refreshtoken)
         console.log("Token authorized.")
         console.log("Writing to file...")
-        await fs.writeFileSync("./tokens/SPOTIFY_TOKEN", `${accesstoken}|${refreshtoken}|`)
+        await fs.writeFileSync("./tokens/SPOTIFY_TOKEN", `${accesstoken}|${refreshtoken}|${Date.now()}`)
         await reply.send("<script> window.close() </script>")
-        console.log("Token written to file.")
+        console.log(chalk.bgGreen("Token written to file."))
         process.exit(1)
     })
 })

@@ -4,12 +4,12 @@
 Ever wanted to integrate Spotify, Time, or other similar widgets into your bio on social media?
 
 ## Officially Supported Apps
-| **Name** | **Status**  | **Extended Note**                                                           |   |   |
-|----------|-------------|-----------------------------------------------------------------------------|---|---|
-| Telegram | Supported   | N/A                                                                         |   |   |
-| Discord  | Not Planned | Due to Discord's ToS, there's no way we can support this.                   |   |   |
-| Twitter  | Planned     | Currently unavailable as I don't have easy access to Twitter's Extended API |   |   |
-
+| **Name** | **Status**  | **Extended Note**                                                          | **Maintainer** |
+|----------|-------------|----------------------------------------------------------------------------|----------------|
+| Telegram | Planned     | N/A                                                                        | @WhenDawnEnds  |
+| Discord  | Not Planned | Due to Discord's ToS, there's no way we can support this.                  | N/A            |
+| Twitter  | Planned     | Currently unavailable as I don't have any access to Twitter's Extended API | N/A            |
+| Console  | Supported   | Mostly used for testing purposes.                                          | @WhenDawnEnds  |
 ## Setup Instructions (Windows)
 TODO
 
