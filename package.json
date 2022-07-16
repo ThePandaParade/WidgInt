@@ -1,0 +1,18 @@
+{
+  "name": "widgint",
+  "version": "1.0.0",
+  "description": "Ever wanted to integrate Spotify, Time, or other similar widgets into your bio on social media?",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "get-spotify-token": "node ./scripts/get-spotify-token.js"
+  },
+  "author": "WhenDawnEnds",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "dotenv": "^16.0.1",
+    "fastify": "^4.2.1",
+    "spotify-web-api-node": "^5.0.2"
+  }
+}
