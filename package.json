@@ -18,6 +18,7 @@
     "spotify-web-api-node": "^5.0.2"
   },
   "optionalDependencies": {
+    "gramjs": "*",
     "telegraf": "^4.8.5",
     "twitter-api-v2": "^1.12.3"
   }

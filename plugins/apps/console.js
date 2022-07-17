@@ -31,12 +31,12 @@ module.exports._METADATA = {
 
 module.exports._init = async () => {
     if (!(process.env.TEST_STAGE == this._METADATA.requireTestStage)) {
-        return false, "fatal", `This module can only be used in TEST_STAGE ${this._METADATA.requireTestStage}.`
+        return false, `This module can only be used in TEST_STAGE ${this._METADATA.requireTestStage}.`
     }
 }
 
 module.exports._run =  async (string) => {
     console.log(string)
 
-    return true, final
+    return true
 }

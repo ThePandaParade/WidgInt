@@ -21,17 +21,21 @@ module.exports._METADATA = {
     deprecated: false,                                      // If true, the module will be removed from the app.
     requireTestStage: 2,                                    // Should be set to 2.
     widgetsRequired: [""],                                  // Array of widgets that this module requires.
-    supportedVersion: "0.0.1"                               // The version of the app that this module was built with.
+    supportedVersion: "0.0.1",                              // The version of the app that this module was built with.
+
+    // Metadata for identification internally.
+    type: 2,                                                // 1 for app, 2 for widget, 3 for expansion.
 }
 
-module.exports._init = async () => {
+module.exports._init = async function () {
     if (!(process.env.TEST_STAGE == 2)) {
-        return false, "fatal", "This module can only be used in TEST_STAGE 2."
+        return false, "This module can only be used in TEST_STAGE 2."
     }
+    return true
 }
 
-module.exports._run =  async () => {
+module.exports._run = async function () {
     let final = "This is a test widget."
 
-    return true, final
+    return final
 }
