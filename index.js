@@ -8,7 +8,7 @@ require("dotenv").config()
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const promptchoices = require("prompt-choices")
+const inquirer = require("inquirer")
 
 // Internal variables.
 let loadedApps = []
@@ -76,8 +76,30 @@ debugLog(`Plugins loaded: ${loadedApps.length} apps, ${loadedWidgets.length} wid
 // Ill do this properly later - for now, hardcoded.
 
 process.env.TEST_STAGE = 2
-const selectedApps = [loadedApps[0]]
-const selectedWidgets = [loadedWidgets[0]]
+const selectedApps = []
+const selectedWidgets = []
+
+let choices = [new inquirer.Separator("= Apps =")]
+.concat(loadedApps.map((x) => {return {name: x._METADATA.name, type: "choice"}}))
+.concat(new inquirer.Separator("= Widgets ="))
+.concat(loadedWidgets.map((x) => {return {name: x._METADATA.name, type: "choice"}}))
+
+inquirer.prompt([{
+    type: "checkbox",
+    name: "appprompt",
+    message: "Choose apps and apps: ",
+    choices: choices
+}])
+.then(answers => {
+    answers.appprompt.forEach(answer => {
+        if (loadedApps.find(a => a._METADATA.name == answer.name)) {
+            selectedApps.push(loadedApps.find(a => a._METADATA.name == answer.name))
+        }
+        else {
+            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer.name))  
+        }
+    })
+})
 
 // Define the string which will be passed to loaded apps.
 
@@ -160,4 +182,3 @@ setInterval( async () => {
 
     string = [] // Clear the string afterwards.
 }, 6000)
-
