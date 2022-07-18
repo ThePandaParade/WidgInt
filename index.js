@@ -73,8 +73,6 @@ debugLog(`Plugins loaded: ${loadedApps.length} apps, ${loadedWidgets.length} wid
 
 // Selection
 
-// Ill do this properly later - for now, hardcoded.
-
 process.env.TEST_STAGE = 2
 const selectedApps = []
 const selectedWidgets = []
@@ -92,18 +90,16 @@ inquirer.prompt([{
 }])
 .then(answers => {
     answers.appprompt.forEach(answer => {
-        if (loadedApps.find(a => a._METADATA.name == answer.name)) {
-            selectedApps.push(loadedApps.find(a => a._METADATA.name == answer.name))
+        if (loadedApps.find(a => a._METADATA.name == answer)) {
+            selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
+            debugLog(`App ${answer} loaded.`)
         }
         else {
-            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer.name))  
+            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer))
+            debugLog(`Widget ${answer} loaded`)
         }
     })
 })
-
-// Define the string which will be passed to loaded apps.
-
-let string = []
 
 // Go through all loaded items to see if they require init
 
@@ -148,11 +144,15 @@ selectedWidgets.forEach(widget => {
 
 // Now we start the main loop...
 
+let final = []
+
 setInterval( async () => {
+    // Cuz for some reason clearing the variable up here causes .push to fail 🤷🤷
+
     selectedWidgets.forEach(async (widget) => {
         try {
             const ret = await widget._run()
-            string.push(ret)
+            final.push(ret)
             debugLog(`Widget ${widget._METADATA.name} returned ${ret}`)
         } catch (err){
             debugLog(`Widget ${widget._METADATA.name} failed to run.`)
@@ -163,15 +163,15 @@ setInterval( async () => {
     // Now the widgets have sent their data our way - we send data to the apps.
     selectedApps.forEach(async (app) => {
         if (app._METADATA.preformat) {
-            string = string.join(" || ")
+            final = final.join(" || ")
         }
         try {
-            if (app._METADATA.maxStringLength > string.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
-                string = string.substring(0, app._METADATA.maxStringLength)
-                debugLog(`String for app ${app._METADATA.name} was too long. Truncated to ${string}`)
+            if (app._METADATA.maxStringLength > final.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
+                final = final.substring(0, app._METADATA.maxStringLength)
+                debugLog(`String for app ${app._METADATA.name} was too long. Truncated to ${final}`)
             }
         } catch {} // Fail silently, app was set not to preformat.
-        const ret = await app._run(string)
+        const ret = await app._run(final)
         if (ret == true) { // This app succeeded.
             debugLog(`App ${app._METADATA.name} returned ${ret[0]}`)
         }
@@ -179,6 +179,5 @@ setInterval( async () => {
             debugLog(`App ${app._METADATA.name} failed to run.`)
         }
     })
-
-    string = [] // Clear the string afterwards.
+    final = []
 }, 6000)
