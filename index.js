@@ -8,7 +8,7 @@ require("dotenv").config()
 const chalk = require("chalk")
 const fs = require("fs")
 const path = require("path")
-const inquirer = require("inquirer")
+const prompt = require("prompt-checkbox")
 
 // Internal variables.
 let loadedApps = []
@@ -73,14 +73,11 @@ debugLog(`Plugins loaded: ${loadedApps.length} apps, ${loadedWidgets.length} wid
 
 // Selection
 
-process.env.TEST_STAGE = 2
 const selectedApps = []
 const selectedWidgets = []
-
-let choices = [new inquirer.Separator("= Apps =")]
-.concat(loadedApps.map((x) => {return {name: x._METADATA.name, type: "choice"}}))
-.concat(new inquirer.Separator("= Widgets ="))
-.concat(loadedWidgets.map((x) => {return {name: x._METADATA.name, type: "choice"}}))
+/* 
+loadedApps.map((x) => {return {name: x._METADATA.name, type: "choice"}})
+loadedWidgets.map((x) => {return {name: x._METADATA.name, type: "choice"}})
 
 (async () => {
     let inq = inquirer.prompt([{
@@ -99,14 +96,46 @@ let choices = [new inquirer.Separator("= Apps =")]
             debugLog(`Widget ${answer} loaded`)
         }
     })
-})()
 
+    process.env.TEST_STAGE = 2
+})()
+.then(async () => {
+    // If the user didn't select enough apps and widgets, exit out.
+    if (selectedApps.length == 0 && selectedWidgets.length == 0) {
+        console.log(chalk.bgRed.white("Not enough apps or widgets were selected. Requires 1 app and 1 widget."))
+        process.exit(1)
+    }
+})
+ */
+var appprompt = new prompt({
+    name: "appprompt",
+    message: "Choose what to enable: ",
+    radio: true,
+    choices: {
+        apps: loadedApps.map((x) => {return x._METADATA.name}),
+        widgets: loadedWidgets.map((x) => {return x._METADATA.name})
+    }
+})
+
+appprompt.run()
+.then(answers => {
+    answers.forEach(answer => {
+        if (loadedApps.find(a => a._METADATA.name == answer)) {
+           selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
+           debugLog(`App ${answer} loaded.`)
+        }
+        else {
+            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer))
+            debugLog(`Widget ${answer} loaded`)
+        }
+    })
+})
 
 // Go through all loaded items to see if they require init
 
+// Init all apps 
 selectedApps.forEach(async (app) => {
-    console.log(app._METADATA)
-    if(app._METADATA.requires_init == true) {
+    console.log(chalk.green(`Initializing app ${app._METADATA.name}`))
         try {
             const retW = await app._init()
             if (retW[0] == false) {
@@ -122,25 +151,22 @@ selectedApps.forEach(async (app) => {
             selectedApps.splice(selectedApps.indexOf(app), 1)
 
         }
-    }
 })
 
 selectedWidgets.forEach(async (widget) => {
-    if(widget._METADATA.requires_init == true) {
-        try {
-            const retW = await widget._init()
-            if (retW[0] == false) {
-                console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
-                debugLog(retW[1])
-                // Unload the app
-                selectedWidgets.splice(selectedWidgets.indexOf(app), 1)
-            }
-        } catch (err) {
+    try {
+        const retW = await widget._init()
+        if (retW[0] == false) {
             console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
-            debugLog(err)
+            debugLog(retW[1])
             // Unload the app
-            selectedWidgets.splice(selectedApps.indexOf(app), 1)
+            selectedWidgets.splice(selectedWidgets.indexOf(app), 1)
         }
+    } catch (err) {
+        console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
+        debugLog(err)
+        // Unload the app
+        selectedWidgets.splice(selectedApps.indexOf(app), 1)
     }
 })
 
@@ -149,24 +175,23 @@ selectedWidgets.forEach(async (widget) => {
 let final = []
 
 setInterval( async () => {
+    final = [];
     // Cuz for some reason clearing the variable up here causes .push to fail 🤷🤷
 
     selectedWidgets.forEach(async (widget) => {
         try {
-            const ret = await widget._run()
+            const ret = await widget._run();
             final.push(ret)
             debugLog(`Widget ${widget._METADATA.name} returned ${ret}`)
         } catch (err){
-            debugLog(`Widget ${widget._METADATA.name} failed to run.`)
+            console.log(chalk.bgRed.white(`Widget ${widget._METADATA.name} failed to run.`))
             debugLog(err)
         }
-    })
+    });
 
+    final = final.join(" || ")
     // Now the widgets have sent their data our way - we send data to the apps.
     selectedApps.forEach(async (app) => {
-        if (app._METADATA.preformat) {
-            final = final.join(" || ")
-        }
         try {
             if (app._METADATA.maxStringLength > final.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
                 final = final.substring(0, app._METADATA.maxStringLength)
@@ -181,5 +206,5 @@ setInterval( async () => {
             debugLog(`App ${app._METADATA.name} failed to run.`)
         }
     })
-    final = []
-}, 6000)
+
+}, 60000)

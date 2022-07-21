@@ -16,7 +16,7 @@ module.exports._METADATA = {
     maintainer: '@WhenDawnEnds',                            // @username
     description: 'Prints out the data from the widgets',    // Short description of the module.
     requires_init: true,                                    // Whether or not this module requires the init function to be run.
-    requires_auth: true,                                    // Whether or not this module requires authentication.
+    //requires_auth: true,                                    // Whether or not this module requires authentication.
     deprecated: false,                                      // If true, the module will be removed from the app.
     requireTestStage: 2,                                    // Should be set to 2.
     supportedVersion: "0.0.1",                              // The version of the app that this module was built with.
