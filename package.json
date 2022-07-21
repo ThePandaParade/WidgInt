@@ -17,6 +17,7 @@
     "inquirer": "^8.0.0"
   },
   "optionalDependencies": {
-    "gramjs": "*"
+    "input": "^1.0.1",
+    "telegram": "^2.9.10"
   }
 }

@@ -82,31 +82,33 @@ let choices = [new inquirer.Separator("= Apps =")]
 .concat(new inquirer.Separator("= Widgets ="))
 .concat(loadedWidgets.map((x) => {return {name: x._METADATA.name, type: "choice"}}))
 
-inquirer.prompt([{
-    type: "checkbox",
-    name: "appprompt",
-    message: "Choose apps and apps: ",
-    choices: choices
-}])
-.then(answers => {
-    answers.appprompt.forEach(answer => {
+(async () => {
+    let inq = inquirer.prompt([{
+        type: "checkbox",
+        name: "appprompt",
+        message: "Choose what to enable: ",
+        choices: choices
+    }])
+    inq.appprompt.forEach(answer => {
         if (loadedApps.find(a => a._METADATA.name == answer)) {
-            selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
-            debugLog(`App ${answer} loaded.`)
+           selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
+           debugLog(`App ${answer} loaded.`)
         }
         else {
             selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer))
             debugLog(`Widget ${answer} loaded`)
         }
     })
-})
+})()
+
 
 // Go through all loaded items to see if they require init
 
-selectedApps.forEach(app => {
-    if(app._METADATA.requires_init) {
+selectedApps.forEach(async (app) => {
+    console.log(app._METADATA)
+    if(app._METADATA.requires_init == true) {
         try {
-            const retW = app._init()
+            const retW = await app._init()
             if (retW[0] == false) {
                 console.warn(`${app._METADATA.name} failed to init. Unloading...`)
                 debugLog(retW[1])
@@ -123,10 +125,10 @@ selectedApps.forEach(app => {
     }
 })
 
-selectedWidgets.forEach(widget => {
-    if(widget._METADATA.requires_init) {
+selectedWidgets.forEach(async (widget) => {
+    if(widget._METADATA.requires_init == true) {
         try {
-            const retW = widget._init()
+            const retW = await widget._init()
             if (retW[0] == false) {
                 console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
                 debugLog(retW[1])
