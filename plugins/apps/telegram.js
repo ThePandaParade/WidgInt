@@ -6,6 +6,14 @@ const chalk = require("chalk")
 const fs = require("fs")
 const input = require("input")
 let has_init = false
+let Telegram;
+
+try {
+    var gram = require("telegram")
+}
+catch {
+    console.log(chalk.red("[Telegram]") + " Optional dependencies are not installed. Please run npm i --")
+}
 
 // Checks are done at this point with the main app.
 // Tokens available and in process.env:
@@ -23,45 +31,53 @@ module.exports._METADATA = {
 
     // Required data for widget formatting.
     maxStringLength: 0,                                     // The maximum available length for the string. 0 for no limit.
-    preformat: false,                                        // Whether or not the string should be preformatted. Will cause the app to pass an array if false.
+    preformat: true,                                        // Whether or not the string should be preformatted. Will cause the app to pass an array if false.
 
     // Metadata for identification internally.
     type: 1,                                                // 1 for app, 2 for widget, 3 for expansion.
 }
 
 module.exports._init = async () => {
-    var gram = require("telegram")
     try {
-        session = new gram.sessions.StringSession(await fs.readFileSync("./tokens/TELEGRAM_TOKEN").toString())    
-    } catch(err) { // A previous session hasn't been saved.
-        console.log(err)
-        process.exit(1) // No session
+        require("telegram") // Check if they have gram installed.
     }
-    const Telegram = new gram.TelegramClient(session, Number(process.env.TELEGRAM_APP_ID), process.env.TELEGRAM_APP_HASH)
-    await Telegram.connect()
-    await fs.writeFileSync("./tokens/TELEGRAM_TOKEN",Telegram.session.save())
-    console.log("Authenticated")
+    catch {
+        console.log(chalk.red("[Telegram]") + " Optional dependencies are not installed. Please run npm i --")
+    }
+    // Check if the token exists
+    if (await fs.existsSync("./tokens/TELEGRAM_TOKEN")) {
+        return true
+    } else {
+        console.error(chalk.red("[Telegram]") + " No token found. Please run get-telegram-token.js to get a token.")
+        process.exit(1)
+    }
     return true
+}
+
+async function preRun() {
+    session = new gram.sessions.StringSession(await fs.readFileSync("./tokens/TELEGRAM_TOKEN").toString())    
+    Telegram = new gram.TelegramClient(session, Number(process.env.TELEGRAM_APP_ID), process.env.TELEGRAM_APP_HASH)
+    Telegram.setLogLevel("none")
+    await Telegram.connect()
+    has_init = true
 }
 
 module.exports._run =  async (string) => {
     if (!has_init) {
-        await this._init() //Init is currently broken; so do it locally!
-        has_init = true
+        await preRun()
     }
 
-    // Go from array to string.
-    string = string.join(" | ");
+    const api = gram.Api.account
 
     // Check if the user has premium (for double bio limit.)
     if (await fs.existsSync("./tokens/TELEGRAM_PREMIUM_TOKEN")) { var premium = true } else { var premium = false }
 
-    //  Truncate the string if its too long for Telegram's bio limit.
+    // Truncate the string if its too long for Telegram's bio limit.
     if (string.length > 70 && !premium) {
         string = string.substring(0,70)
     } else if (string.length > 140 && premium) { string = string.substring(0,140) } // Yeah fuck whoever decided double bio was a paywall feature.
 
-    if (process.env.TEST_MODE) {
+    if (process.env.TEST_MODE == "true") {
         // Test mode is enabled: don't update the actual bio.
         console.log(chalk.yellow("[Telegram]") + " Test mode is on. Skipping bio changes.")
         console.log(chalk.yellow("[Telegram]") + " Result: " + chalk.blue(string))
@@ -69,7 +85,8 @@ module.exports._run =  async (string) => {
     }
     else {
         // Test mode is disabled: update the actual bio.
-        await Telegram.account.updateProfile({bio: string})
+        await Telegram.invoke(api.account.UpdateStatus({offline: true})) // Don't update the online presence.
+        await Telegram.invoke(api.account.updateProfile({about: string}))
         return true
     }
 }

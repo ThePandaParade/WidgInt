@@ -1,9 +1,11 @@
 # WidgInt
+
 ## Integrate widgets into social media bios.
 
 Ever wanted to integrate Spotify, time, or other similar info into your bio on social media?
 
 ## Officially Supported Apps
+
 | **Name** | **Status**  | **Extended Note**                                                          | **Maintainer** |
 |----------|-------------|----------------------------------------------------------------------------|----------------|
 | Telegram | Planned     | N/A                                                                        | @WhenDawnEnds  |
@@ -12,20 +14,23 @@ Ever wanted to integrate Spotify, time, or other similar info into your bio on s
 | Console  | Supported   | Mostly used for testing purposes.                                          | @WhenDawnEnds  |
 
 ## Officially Supported Widgets
+
 | **Name**   | **Status**  | **Extended Note**                                                          | **Maintainer** |
 |----------  |-------------|----------------------------------------------------------------------------|----------------|
 | Spotify    | Planned     | N/A                                                                        | @WhenDawnEnds  |
-| Time       | Planned     | N/A                                                                        | @WhenDawnEnds  |
+| Time       | Supported   | Uses local time.                                                           | @WhenDawnEnds  |
 | Weather    | Planned     | N/A                                                                        | @WhenDawnEnds  |
 | Compactify | Planned     | "Compacts" the widgets.                                                    | @WhenDawnEnds  |
 | Awake?     | Planned     | Uses the time to see if the user is awake.                                 | @WhenDawnEnds  |
 
-
 ## Setup Instructions (Windows)
+
 TODO
 
 ## Setup Instructions (Mac OS)
+
 TODO
 
 ## Setup Instructions (Linux)
+
 TODO

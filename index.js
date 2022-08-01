@@ -30,7 +30,7 @@ function pluginCheck(plugin,type) {
             if (!(pluginModule._METADATA && pluginModule._run)) { // Check if the plugin is valid.
                 throw new Error("Plugin is missing metadata or run function.")
             }
-            if (!(pluginModule._METADATA.requires_init && pluginModule._init)) { // Check if the plugin is valid.
+            if ((pluginModule._METADATA.requires_init == true && !pluginModule._init)) { // Check if the plugin is valid.
                 throw new Error("Plugin's METADATA says _init is required, however none is provided.")
             }
 
@@ -184,8 +184,9 @@ process.on("SIGINT", async () => {
 
 let final = []
 
+console.log(chalk.green("[Index]") + "Main loop started.")
 setInterval( async () => {
-    final = [];
+    //final = [];
     // Cuz for some reason clearing the variable up here causes .push to fail 🤷🤷
 
     selectedWidgets.forEach(async (widget) => {
@@ -199,9 +200,9 @@ setInterval( async () => {
         }
     });
 
-    if (process.env.SUFFIX) { //Append the suffix.
-        final.push(process.env.SUFFIX)
-    }
+/*     if (suffix) { //Append the suffix.
+        final.push(suffix)
+    } */
     // Now the widgets have sent their data our way - we send data to the apps.
     selectedApps.forEach(async (app) => {
         try {
@@ -222,4 +223,5 @@ setInterval( async () => {
         }
     })
 
+    final = []
 }, 6000)

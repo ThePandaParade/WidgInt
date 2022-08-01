@@ -5,9 +5,9 @@ require("dotenv").config()
 
 // File metadata.
 module.exports._METADATA = {
-    name: 'Time Widget',                                    // Name of the module.
+    name: 'Website Suffix',                                    // Name of the module.
     maintainer: '@WhenDawnEnds',                            // @username
-    description: 'Displays the current time & timezone',    // Short description of the module.
+    description: 'Adds your website to the widgets.',    // Short description of the module.
     requires_init: false,                                    // Whether or not this module requires the init function to be run.
     deprecated: false,                                      // If true, the module will be removed from the app.
     supportedVersion: "0.0.1",                              // The version of the app that this module was built with.
@@ -16,20 +16,8 @@ module.exports._METADATA = {
     type: 2,                                                // 1 for app, 2 for widget, 3 for expansion.
 }
 
-module.exports._init = async function () {
-    if (!(process.env.TEST_STAGE == 2)) {
-        return false, "This module can only be used in TEST_STAGE 2."
-    }
-    return true
-}
-
 module.exports._run = async function () {
-    let final = "Unable to get the current time."
+    let final = "https://pandapa.ws/"
 
-    // Grab the current date and format it to human readable.
-    let date = new Date()
-    final = date.toLocaleString(undefined,{timeZoneName: "short"})
-
-    // Then pass it.
     return final
 }

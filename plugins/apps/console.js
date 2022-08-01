@@ -1,4 +1,3 @@
-// Starts Spotify - Console integration.
 // Maintainer: @WhenDawnEnds
 // Last updated: 2022-07-16
 
