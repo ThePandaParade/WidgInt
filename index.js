@@ -119,13 +119,16 @@ var appprompt = new prompt({
 
 appprompt.run()
 .then(answers => {
-    answers.forEach(answer => {
+    answers.forEach(async (answer) => {
         if (loadedApps.find(a => a._METADATA.name == answer)) {
-           selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
+           var app = loadedApps.find(a => a._METADATA.name == answer)
+           selectedApps.push(app)
+           await app._init()
            debugLog(`App ${answer} loaded.`)
         }
         else {
-            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer))
+            var widget = loadedWidgets.find(w => w._METADATA.name == answer)
+            selectedWidgets.push(widget)
             debugLog(`Widget ${answer} loaded`)
         }
     })
@@ -170,6 +173,13 @@ selectedWidgets.forEach(async (widget) => {
     }
 })
 
+// Add handling for Ctrl + C
+process.on("SIGINT", async () => {
+    console.log(chalk.red("Shutting down..."))
+    // Until an unload functionality is added, force quit.
+    process.exit(-1)
+})
+
 // Now we start the main loop...
 
 let final = []
@@ -181,7 +191,7 @@ setInterval( async () => {
     selectedWidgets.forEach(async (widget) => {
         try {
             const ret = await widget._run();
-            final.push(ret)
+            final.push(ret);
             debugLog(`Widget ${widget._METADATA.name} returned ${ret}`)
         } catch (err){
             console.log(chalk.bgRed.white(`Widget ${widget._METADATA.name} failed to run.`))
@@ -189,10 +199,15 @@ setInterval( async () => {
         }
     });
 
-    final = final.join(" || ")
+    if (process.env.SUFFIX) { //Append the suffix.
+        final.push(process.env.SUFFIX)
+    }
     // Now the widgets have sent their data our way - we send data to the apps.
     selectedApps.forEach(async (app) => {
         try {
+            if (app._METADATA.preformat) {
+                final = final.join(" || ")
+            }
             if (app._METADATA.maxStringLength > final.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
                 final = final.substring(0, app._METADATA.maxStringLength)
                 debugLog(`String for app ${app._METADATA.name} was too long. Truncated to ${final}`)
@@ -207,4 +222,4 @@ setInterval( async () => {
         }
     })
 
-}, 60000)
+}, 6000)

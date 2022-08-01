@@ -5,11 +5,6 @@
 require("dotenv").config()
 const chalk = require("chalk")
 
-// Checks are done at this point with the main app.
-// Tokens available and in process.env:
-// SPOTIFY_ACCESS_API
-// SPOTIFY_REFRESH_API
-
 // File metadata.
 module.exports._METADATA = {
     name: 'Console Integration',                            // Name of the module.
@@ -33,6 +28,8 @@ module.exports._init = async () => {
     if (!(process.env.TEST_STAGE == this._METADATA.requireTestStage)) {
         return false, `This module can only be used in TEST_STAGE ${this._METADATA.requireTestStage}.`
     }
+
+    console.log("boo!")
 }
 
 module.exports._run =  async (string) => {
