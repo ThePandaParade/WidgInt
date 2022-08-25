@@ -123,54 +123,20 @@ appprompt.run()
         if (loadedApps.find(a => a._METADATA.name == answer)) {
            var app = loadedApps.find(a => a._METADATA.name == answer)
            selectedApps.push(app)
-           await app._init()
+           if (app._METADATA.requires_init) {
+                await app._init()
+           }
            debugLog(`App ${answer} loaded.`)
         }
         else {
             var widget = loadedWidgets.find(w => w._METADATA.name == answer)
             selectedWidgets.push(widget)
+            if (widget._METADATA.requires_init) {
+                await widget._init()
+            }
             debugLog(`Widget ${answer} loaded`)
         }
     })
-})
-
-// Go through all loaded items to see if they require init
-
-// Init all apps 
-selectedApps.forEach(async (app) => {
-    console.log(chalk.green(`Initializing app ${app._METADATA.name}`))
-        try {
-            const retW = await app._init()
-            if (retW[0] == false) {
-                console.warn(`${app._METADATA.name} failed to init. Unloading...`)
-                debugLog(retW[1])
-                // Unload the app
-                selectedApps.splice(selectedApps.indexOf(app), 1)
-            }
-        } catch (err) {
-            console.warn(`${app._METADATA.name} failed to init. Unloading...`)
-            debugLog(err)
-            // Unload the app
-            selectedApps.splice(selectedApps.indexOf(app), 1)
-
-        }
-})
-
-selectedWidgets.forEach(async (widget) => {
-    try {
-        const retW = await widget._init()
-        if (retW[0] == false) {
-            console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
-            debugLog(retW[1])
-            // Unload the app
-            selectedWidgets.splice(selectedWidgets.indexOf(app), 1)
-        }
-    } catch (err) {
-        console.warn(`${widget._METADATA.name} failed to init. Unloading...`)
-        debugLog(err)
-        // Unload the app
-        selectedWidgets.splice(selectedApps.indexOf(app), 1)
-    }
 })
 
 // Add handling for Ctrl + C
@@ -224,4 +190,4 @@ setInterval( async () => {
     })
 
     final = []
-}, 6000)
+}, Number(process.env.LOOP_HALT) * 1000)

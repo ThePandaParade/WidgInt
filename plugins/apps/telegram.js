@@ -12,7 +12,7 @@ try {
     var gram = require("telegram")
 }
 catch {
-    console.log(chalk.red("[Telegram]") + " Optional dependencies are not installed. Please run npm i --")
+    console.log(chalk.red("[Telegram]") + " Optional dependencies are not installed. Please run npm i")
 }
 
 // Checks are done at this point with the main app.
@@ -48,7 +48,7 @@ module.exports._init = async () => {
     if (await fs.existsSync("./tokens/TELEGRAM_TOKEN")) {
         return true
     } else {
-        console.error(chalk.red("[Telegram]") + " No token found. Please run get-telegram-token.js to get a token.")
+        console.error(chalk.red("[Telegram]") + " No token found. Please run npm run get-telegram-token to get a token.")
         process.exit(1)
     }
     return true
@@ -67,7 +67,8 @@ module.exports._run =  async (string) => {
         await preRun()
     }
 
-    const api = gram.Api.account
+    await Telegram.sendMessage("me", { message: "Hello World!"})
+    const api = gram.Api
 
     // Check if the user has premium (for double bio limit.)
     if (await fs.existsSync("./tokens/TELEGRAM_PREMIUM_TOKEN")) { var premium = true } else { var premium = false }
@@ -85,8 +86,8 @@ module.exports._run =  async (string) => {
     }
     else {
         // Test mode is disabled: update the actual bio.
-        await Telegram.invoke(api.account.UpdateStatus({offline: true})) // Don't update the online presence.
-        await Telegram.invoke(api.account.updateProfile({about: string}))
+        await Telegram.invoke(new api.account.UpdateStatus({offline: true})) // Don't update the online presence.
+        await Telegram.invoke(new api.account.UpdateProfile({about: string}))
         return true
     }
 }

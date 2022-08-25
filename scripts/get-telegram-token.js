@@ -12,9 +12,9 @@ await Telegram.start({
     password: async () => await input.text("Please enter your 2FA password > "),
     phoneCode: async () => await input.text("Please enter the code you recieved >"),
     onError: async (err) => {throw err}
-})
-await fs.writeFileSync("./tokens/TELEGRAM_TOKEN",Telegram.session.save())
-console.log("Authenticated to Telegram")
+});
+await fs.writeFileSync("./tokens/TELEGRAM_TOKEN",Telegram.session.save());
+console.log("Authenticated to Telegram");
 
 (async () => {
     const resp = await input.text("Do you have Premium? (y == yes/n == no) > ")
