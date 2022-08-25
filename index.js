@@ -150,7 +150,7 @@ process.on("SIGINT", async () => {
 
 let final = []
 
-console.log(chalk.green("[Index]") + "Main loop started.")
+console.log(chalk.green("[Index]") + " Main loop started.")
 setInterval( async () => {
     //final = [];
     // Cuz for some reason clearing the variable up here causes .push to fail 🤷🤷

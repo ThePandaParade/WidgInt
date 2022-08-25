@@ -17,7 +17,7 @@ module.exports._METADATA = {
 }
 
 module.exports._run = async function () {
-    let final = "https://pandapa.ws/"
+    let final = "he/they || https://pandapa.ws/"
 
     return final
 }

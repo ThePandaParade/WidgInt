@@ -22,7 +22,6 @@ fastify.get(process.env.SPOTIFY_REDIRECT_ROUTE, async (request, reply) => {
             console.error(chalk.bgRed.white("No token recieved. This shouldn't happen - therefore please retry, or start an issue!"))
             process.exit(1)
         }
-        console.log(accesstoken,refreshtoken)
         console.log("Token authorized.")
         console.log("Writing to file...")
         await fs.writeFileSync("./tokens/SPOTIFY_TOKEN", `${accesstoken}|${refreshtoken}|${Date.now()}`)
