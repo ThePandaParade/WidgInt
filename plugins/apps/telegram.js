@@ -67,16 +67,14 @@ module.exports._run =  async (string) => {
         await preRun()
     }
 
-    await Telegram.sendMessage("me", { message: "Hello World!"})
     const api = gram.Api
 
     // Check if the user has premium (for double bio limit.)
     if (await fs.existsSync("./tokens/TELEGRAM_PREMIUM_TOKEN")) { var premium = true } else { var premium = false }
 
     // Truncate the string if its too long for Telegram's bio limit.
-    if (string.length > 70 && !premium) {
-        string = string.substring(0,70)
-    } else if (string.length > 140 && premium) { string = string.substring(0,140) } // Yeah fuck whoever decided double bio was a paywall feature.
+    if (string.length > 70 && !premium) { string = string.substring(0,70) } 
+    else if (string.length > 140 && premium) { string = string.substring(0,140) } // Yeah fuck whoever decided double bio was a paywall feature.
 
     if (process.env.TEST_MODE == "true") {
         // Test mode is enabled: don't update the actual bio.

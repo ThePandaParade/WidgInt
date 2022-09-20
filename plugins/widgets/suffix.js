@@ -5,9 +5,9 @@ require("dotenv").config()
 
 // File metadata.
 module.exports._METADATA = {
-    name: 'Website Suffix',                                    // Name of the module.
+    name: 'Static Text',                                    // Name of the module.
     maintainer: '@WhenDawnEnds',                            // @username
-    description: 'Adds your website to the widgets.',    // Short description of the module.
+    description: 'Adds static text to the apps.',    // Short description of the module.
     requires_init: false,                                    // Whether or not this module requires the init function to be run.
     deprecated: false,                                      // If true, the module will be removed from the app.
     supportedVersion: "0.0.1",                              // The version of the app that this module was built with.
@@ -17,7 +17,7 @@ module.exports._METADATA = {
 }
 
 module.exports._run = async function () {
-    let final = "he/they || https://pandapa.ws/"
+    let final = "🙋 he/they || 🌐 https://pandapa.ws/"
 
     return final
 }

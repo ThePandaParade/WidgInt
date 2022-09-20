@@ -11,7 +11,7 @@ let fatal = 0
 
 if(!(fs.readFileSync("./tokens/SPOTIFY_TOKEN")) && !process.env.SPOTIFY_TOKEN) {
     console.log(chalk.bgYellow.white("[WARNING] No Spotify token found. Please run 'npm run get-spotify-token' to get a token."))
-    warn += 1
+    fatal += 1
 }
 else {
     console.log(chalk.bgGreen.white("[PASS] Spotify token found."))

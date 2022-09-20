@@ -52,6 +52,41 @@ function pluginCheck(plugin,type) {
     }
 }
 
+async function mainLoop() {
+    selectedWidgets.forEach(async (widget) => {
+        try {
+            const ret = await widget._run();
+            final.push(ret);
+            debugLog(`Widget ${widget._METADATA.name} returned ${ret}`)
+        } catch (err){
+            console.log(chalk.bgRed.white(`Widget ${widget._METADATA.name} failed to run.`))
+            debugLog(err)
+        }
+    });
+
+    // Now the widgets have sent their data our way - we send data to the apps.
+    selectedApps.forEach(async (app) => {
+        try {
+            if (app._METADATA.preformat) {
+                final = final.join(" || ")
+            }
+            if (app._METADATA.maxStringLength > final.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
+                final = final.substring(0, app._METADATA.maxStringLength)
+                debugLog(`String for app ${app._METADATA.name} was too long. Truncated to ${final}`)
+            }
+        } catch {} // Fail silently, app was set not to preformat.
+        const ret = await app._run(final)
+        if (ret == true) { // This app succeeded.
+            debugLog(`App ${app._METADATA.name} returned ${ret[0]}`)
+        }
+        else {
+            debugLog(`App ${app._METADATA.name} failed to run.`)
+        }
+    })
+
+    final = [];
+}
+
 // Now the real fun!
 // Loads all plugins. Does not run if MODULAR is false.
 
@@ -75,38 +110,7 @@ debugLog(`Plugins loaded: ${loadedApps.length} apps, ${loadedWidgets.length} wid
 
 const selectedApps = []
 const selectedWidgets = []
-/* 
-loadedApps.map((x) => {return {name: x._METADATA.name, type: "choice"}})
-loadedWidgets.map((x) => {return {name: x._METADATA.name, type: "choice"}})
 
-(async () => {
-    let inq = inquirer.prompt([{
-        type: "checkbox",
-        name: "appprompt",
-        message: "Choose what to enable: ",
-        choices: choices
-    }])
-    inq.appprompt.forEach(answer => {
-        if (loadedApps.find(a => a._METADATA.name == answer)) {
-           selectedApps.push(loadedApps.find(a => a._METADATA.name == answer))
-           debugLog(`App ${answer} loaded.`)
-        }
-        else {
-            selectedWidgets.push(loadedWidgets.find(w => w._METADATA.name == answer))
-            debugLog(`Widget ${answer} loaded`)
-        }
-    })
-
-    process.env.TEST_STAGE = 2
-})()
-.then(async () => {
-    // If the user didn't select enough apps and widgets, exit out.
-    if (selectedApps.length == 0 && selectedWidgets.length == 0) {
-        console.log(chalk.bgRed.white("Not enough apps or widgets were selected. Requires 1 app and 1 widget."))
-        process.exit(1)
-    }
-})
- */
 var appprompt = new prompt({
     name: "appprompt",
     message: "Choose what to enable: ",
@@ -139,55 +143,12 @@ appprompt.run()
     })
 })
 
-// Add handling for Ctrl + C
-process.on("SIGINT", async () => {
-    console.log(chalk.red("Shutting down..."))
-    // Until an unload functionality is added, force quit.
-    process.exit(-1)
-})
-
 // Now we start the main loop...
 
 let final = []
 
-console.log(chalk.green("[Index]") + " Main loop started.")
-setInterval( async () => {
-    //final = [];
-    // Cuz for some reason clearing the variable up here causes .push to fail 🤷🤷
+console.log(chalk.green("[Index]") + " Main loop started.");
 
-    selectedWidgets.forEach(async (widget) => {
-        try {
-            const ret = await widget._run();
-            final.push(ret);
-            debugLog(`Widget ${widget._METADATA.name} returned ${ret}`)
-        } catch (err){
-            console.log(chalk.bgRed.white(`Widget ${widget._METADATA.name} failed to run.`))
-            debugLog(err)
-        }
-    });
-
-/*     if (suffix) { //Append the suffix.
-        final.push(suffix)
-    } */
-    // Now the widgets have sent their data our way - we send data to the apps.
-    selectedApps.forEach(async (app) => {
-        try {
-            if (app._METADATA.preformat) {
-                final = final.join(" || ")
-            }
-            if (app._METADATA.maxStringLength > final.length && app._METADATA.maxStringLength > 0) { // If the string is too long, truncate it.
-                final = final.substring(0, app._METADATA.maxStringLength)
-                debugLog(`String for app ${app._METADATA.name} was too long. Truncated to ${final}`)
-            }
-        } catch {} // Fail silently, app was set not to preformat.
-        const ret = await app._run(final)
-        if (ret == true) { // This app succeeded.
-            debugLog(`App ${app._METADATA.name} returned ${ret[0]}`)
-        }
-        else {
-            debugLog(`App ${app._METADATA.name} failed to run.`)
-        }
-    })
-
-    final = []
-}, Number(process.env.LOOP_HALT) * 1000)
+// Run it once, leave setInterval to do the rest.
+mainLoop()
+setInterval(mainLoop, Number(process.env.LOOP_HALT) * 1000)

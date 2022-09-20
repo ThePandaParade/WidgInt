@@ -43,8 +43,9 @@ async function preRun() {
         clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
         redirectUri: process.env.SPOTIFY_REDIRECT_URI + process.env.SPOTIFY_REDIRECT_ROUTE
     })
-    spotify.setAccessToken(await fs.readFileSync("./tokens/SPOTIFY_TOKEN").toString().split("|")[0])
-    spotify.setRefreshToken(await fs.readFileSync("./tokens/SPOTIFY_TOKEN").toString().split("|")[1])
+    const tokenFile = await fs.readFileSync("./tokens/SPOTIFY_TOKEN")
+    spotify.setAccessToken(tokenFile.toString().split("|")[0])
+    spotify.setRefreshToken(tokenFile.toString().split("|")[1])
     return spotify
 }
 
@@ -58,7 +59,7 @@ module.exports._run = async function () {
     const track = await spotify.getMyCurrentPlayingTrack()
     // Nothing is playing right now
     if (track.body == null||track.body.item == undefined) {
-        final = "⏯️ Not Playing."
+        final = "⏯️ Not Playing Anything."
     } else {
         const progressFormatted = fmtMSS(~~(track.body.progress_ms / 1000))
         const durationFormatted = fmtMSS(~~(track.body.item.duration_ms / 1000))
@@ -66,6 +67,14 @@ module.exports._run = async function () {
         final = `⏯️ ${track.body.item.artists[0].name} - ${track.body.item.name}  (${progressFormatted} - ${durationFormatted})`
     }
 
+    // Refresh the access token, as its length is unditermined.
+    spotify.refreshAccessToken((err, data) => {
+        if (err) {
+            console.log(chalk.red("[Spotify]") + " Error refreshing access token: " + err)
+        } else {
+            spotify.setAccessToken(data.body.access_token)
+        }
+    })
     // Then pass it.
     return final
 }

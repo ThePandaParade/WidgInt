@@ -9,7 +9,7 @@ module.exports._METADATA = {
     name: 'Console Integration',                            // Name of the module.
     maintainer: '@WhenDawnEnds',                            // @username
     description: 'Prints out the data from the widgets',    // Short description of the module.
-    requires_init: true,                                    // Whether or not this module requires the init function to be run.
+    requires_init: false,                                    // Whether or not this module requires the init function to be run.
     deprecated: false,                                      // If true, the module will be removed from the app.
     supportedVersion: "0.0.1",                              // The version of the app that this module was built with.
 
@@ -22,11 +22,7 @@ module.exports._METADATA = {
 }
 
 module.exports._init = async () => {
-    if (!(process.env.TEST_STAGE == this._METADATA.requireTestStage)) {
-        return false, `This module can only be used in TEST_STAGE ${this._METADATA.requireTestStage}.`
-    }
-
-    console.log("boo!")
+    return true
 }
 
 module.exports._run =  async (string) => {

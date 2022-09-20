@@ -19,13 +19,13 @@ fastify.get(process.env.SPOTIFY_REDIRECT_ROUTE, async (request, reply) => {
         let refreshtoken = data.body["refresh_token"]
 
         if (accesstoken == (undefined||"")) { // Check if accesstoken returned, as refreshtoken would be valid
-            console.error(chalk.bgRed.white("No token recieved. This shouldn't happen - therefore please retry, or start an issue!"))
+            console.error(chalk.bgRed.white("No token recieved. This shouldn't happen - therefore please retry, or start an issue on GitHub!"))
             process.exit(1)
         }
         console.log("Token authorized.")
         console.log("Writing to file...")
         await fs.writeFileSync("./tokens/SPOTIFY_TOKEN", `${accesstoken}|${refreshtoken}|${Date.now()}`)
-        await reply.send("<script> window.close() </script>")
+        await reply.send("<h1>Authorized! You can close this window now.</h1><h2>Opened: " + new Date() + " </h2>")
         console.log(chalk.bgGreen("Token written to file."))
         process.exit(1)
     })

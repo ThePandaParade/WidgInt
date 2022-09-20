@@ -17,9 +17,6 @@ module.exports._METADATA = {
 }
 
 module.exports._init = async function () {
-    if (!(process.env.TEST_STAGE == 2)) {
-        return false, "This module can only be used in TEST_STAGE 2."
-    }
     return true
 }
 
@@ -28,8 +25,8 @@ module.exports._run = async function () {
 
     // Grab the current date and format it to human readable.
     let date = new Date()
-    final = date.toLocaleString(undefined,{timeZoneName: "short"})
+    final = date.toLocaleString("en-GB",{timeZoneName: "short",hour12:true})
 
     // Then pass it.
-    return final
+    return "🕐 " + final
 }
